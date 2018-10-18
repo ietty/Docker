@@ -1,4 +1,4 @@
-From: ubuntu:latest
+FROM ubuntu:latest
 
 LABEL MAINTAINER=takemi.ohama<takemi.ohama@gmail.com>
 
