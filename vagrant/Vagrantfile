@@ -1,0 +1,20 @@
+VAGRANTFILE_API_VERSION = "2"
+
+unless Vagrant.has_plugin?('Bindfs')
+  puts 'you need `vagrant plugin install vagrant-bindfs`'
+  exit
+end
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  config.vm.define :base  do | v |
+    v.vm.box = "ubuntu/wily64"
+  end
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--vram", 16]
+    vb.customize ["modifyvm", :id, "--memory", "2048"]
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    vb.gui = false
+  end
+  config.vm.provision :shell, path: "init.sh"
+end

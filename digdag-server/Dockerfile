@@ -1,0 +1,58 @@
+FROM ubuntu:bionic
+
+LABEL maintainer=takemi.ohama<takemi.ohama@gmail.com>
+
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && apt-get install -y apt-utils && \
+    apt-get install -y vim wget tzdata mysql-client ssh libreadline-dev curl git \
+    bzip2 ca-certificates sudo locales language-pack-ja-base language-pack-ja \
+    g++ make libmysqlclient-dev ruby ruby-dev python3-pip lftp openjdk-8-jdk nkf \
+    postgresql-client \
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN sed -i -e "s/# ja_JP.UTF-8 UTF-8/ja_JP.UTF-8 UTF-8/" /etc/locale.gen
+RUN locale-gen
+RUN update-locale LANG=ja_JP.UTF-8 LANGUAGE="ja_JP:ja"
+
+RUN pip3 install pandas sqlalchemy requests mysql-connector-python awscli 
+RUN echo "complete -C aws_completer aws" >> /etc/profile
+
+RUN useradd -m -s /bin/bash docker && \
+    usermod -G users docker && \
+    usermod -G users root && \
+    echo '%users ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers && \
+    mkdir /home/docker/.ssh && chown docker.docker /home/docker/.ssh
+
+RUN mkdir /var/run/sshd && \
+    sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
+RUN wget -q "https://dl.digdag.io/digdag-latest" -O /usr/local/bin/digdag
+RUN chmod +x /usr/local/bin/digdag
+
+RUN wget -q "https://dl.bintray.com/embulk/maven/embulk-0.9.7.jar" -O /usr/local/bin/embulk
+RUN chmod +x /usr/local/bin/embulk
+RUN gem install bundler samidare
+
+COPY ./entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+RUN mkdir -p /srv/dagstorage/logs && chown -R docker.docker /srv
+
+USER docker
+
+RUN mkdir -p /home/docker/.config/digdag && \
+    echo "params.project = please_overwrite_this_config" > /home/docker/.config/digdag/config
+
+RUN embulk gem install embulk-input-http embulk-input-mysql embulk-input-google_analytics \
+    embulk-input-google_spreadsheets embulk-input-redash \
+    embulk-output-bigquery embulk-output-mysql embulk-output-s3 embulk-output-elasticsearch \
+    embulk-output-gcs embulk-output-google_spreadsheets embulk-output-elasticsearch5 embulk-output-redis \
+    embulk-filter-column embulk-filter-ruby_proc embulk-filter-row embulk-filter-add_time \
+    embulk-filter-mysql embulk-parser-jsonl embulk-formatter-jsonl embulk-filter-unpivot \
+    embulk-filter-rearrange
+
+EXPOSE 65432 65433
+
+ENTRYPOINT ["/entrypoint.sh"]
+
