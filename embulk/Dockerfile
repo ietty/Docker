@@ -16,8 +16,7 @@ RUN locale-gen
 RUN update-locale LANG=ja_JP.UTF-8 LANGUAGE="ja_JP:ja"  
 ENV LANG=ja_JP.UTF-8 
 
-RUN pip3 install --upgrade pip3 && \
-    pip3 install awscli && \
+RUN pip3 install awscli && \
     echo "complete -C aws_completer aws" >> /etc/profile
 
 RUN useradd -m -s /bin/bash docker && \
