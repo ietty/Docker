@@ -29,6 +29,7 @@ RUN wget -q "https://dl.embulk.org/embulk-latest.jar" -O /usr/local/bin/embulk
 RUN chmod +x /usr/local/bin/embulk
 
 USER docker
+ENV LANG=ja_JP.UTF-8 
 
 RUN embulk gem install embulk-input-http embulk-input-mysql embulk-input-google_analytics \
     embulk-input-google_spreadsheets embulk-input-redash \
@@ -37,3 +38,4 @@ RUN embulk gem install embulk-input-http embulk-input-mysql embulk-input-google_
     embulk-filter-column embulk-filter-ruby_proc embulk-filter-row embulk-filter-add_time \
     embulk-filter-mysql embulk-parser-jsonl embulk-formatter-jsonl embulk-filter-unpivot
 
+ENTRYPOINT ["bash","-l"]
