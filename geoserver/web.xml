@@ -157,10 +157,10 @@
      -->
    </filter>
    <!-- Uncomment following filter to enable CORS -->
-   <!-- <filter>
+    <filter>
         <filter-name>cross-origin</filter-name>
         <filter-class>org.eclipse.jetty.servlets.CrossOriginFilter</filter-class>
-    </filter> -->
+    </filter>
 
     <!-- 
       THIS FILTER MUST BE THE FIRST ONE, otherwise we end up with ruined chars in the input from the GUI
