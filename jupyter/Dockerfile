@@ -37,6 +37,7 @@ RUN conda install --quiet --yes \
     'xgboost' \
     'tensorflow' \
     'seaborn' \
+    'swig' \
     'imbalanced-learn' \
     'flask' \
     && conda clean -tipsy
