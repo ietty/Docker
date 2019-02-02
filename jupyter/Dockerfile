@@ -36,6 +36,7 @@ RUN conda install --quiet --yes \
     'jupyterhub' \ 
     'xgboost' \
     'tensorflow' \
+    'seaborn' \
     'imbalanced-learn' \
     'flask' \
     && conda clean -tipsy
