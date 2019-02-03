@@ -30,6 +30,7 @@ RUN conda install --quiet --yes \
     'readline' \
     'mysql-connector-python' \
     'pymysql' \
+    'pydata-google-auth' \
     'pandas-gbq' \
     'gensim' \ 
     'jupyterlab' \ 
