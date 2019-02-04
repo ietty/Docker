@@ -36,6 +36,7 @@ RUN conda install --quiet --yes \
     'jupyterlab' \ 
     'jupyterhub' \ 
     'xgboost' \
+    'lightgbm' \
     'tensorflow' \
     'seaborn' \
     'swig' \
