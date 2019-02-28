@@ -42,6 +42,7 @@ RUN conda install --quiet --yes \
     'swig' \
     'imbalanced-learn' \
     'flask' \
+    'uwsgi' \
     && conda clean -tipsy
 
 USER $NB_USER
