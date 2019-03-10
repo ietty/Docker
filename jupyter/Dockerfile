@@ -5,16 +5,18 @@ MAINTAINER "takemi.ohama" <takemi.ohama@ietty.co.jp>
 USER root
 
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-    wget curl ssh libreadline-dev vim \
+    wget curl ssh libreadline-dev vim gnupg \
     lsb-release \ 
     libxrender1 \
     mysql-client \
     language-pack-ja-base language-pack-ja fonts-mplus \
     ffmpeg graphviz mecab libmecab-dev mecab-ipadic-utf8
 
-#RUN echo "deb http://packages.cloud.google.com/apt cloud-sdk-jessie main" | tee /etc/apt/sources.list.d/google-cloud-sdk.list && \
-#    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-#    apt-get update && apt-get install -yq google-cloud-sdk 
+RUN export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
+    echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    apt-get install google-cloud-sdk -y
+
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd && \
@@ -26,6 +28,7 @@ RUN update-locale LANGUAGE=ja_JP:ja LANG=ja_JP.UTF-8
 
 # Install Python 3 packages
 RUN conda install --quiet --yes \
+    '
     'conda-build' \
     'readline' \
     'mysql-connector-python' \
