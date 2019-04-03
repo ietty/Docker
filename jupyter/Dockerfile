@@ -45,6 +45,8 @@ RUN conda install --quiet --yes \
     'imbalanced-learn' \
     'flask' \
     'uwsgi' \
+    'featuretools' \
+    'deap' \
     && conda clean -tipsy
 
 USER $NB_USER
