@@ -12,10 +12,11 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     language-pack-ja-base language-pack-ja fonts-mplus \
     ffmpeg graphviz mecab libmecab-dev mecab-ipadic-utf8
 
+#RUN export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
 RUN export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
-    echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get install google-cloud-sdk -y
+  echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - && \
+  sudo apt-get update && sudo apt-get install -y google-cloud-sdk
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
