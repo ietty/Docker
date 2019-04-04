@@ -1,4 +1,4 @@
-from jupyter/scipy-notebook
+docfrom jupyter/scipy-notebook
 
 MAINTAINER "takemi.ohama" <takemi.ohama@ietty.co.jp>
 
@@ -52,6 +52,6 @@ RUN conda install --quiet --yes \
 
 USER $NB_USER
 
-RUN /opt/conda/bin/pip install --user --upgrade pip graphviz mecab-python3 bash_kernel
+RUN /opt/conda/bin/pip install --user --upgrade pip graphviz mecab-python3 bash_kernel pybigquery
 RUN python -m bash_kernel.install 
 RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix
