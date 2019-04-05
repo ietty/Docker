@@ -48,12 +48,10 @@ RUN conda install --quiet --yes \
     'uwsgi' \
     'featuretools' \
     'deap' \
-    'redis' \
-    'hiredis' \
     && conda clean -tipsy
 
 USER $NB_USER
 
-RUN /opt/conda/bin/pip install --user --upgrade pip graphviz mecab-python3 bash_kernel pybigquery
+RUN /opt/conda/bin/pip install --user --upgrade pip graphviz mecab-python3 bash_kernel pybigquery redis hiredis
 RUN python -m bash_kernel.install 
 RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix
