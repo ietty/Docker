@@ -49,6 +49,7 @@ RUN conda install --quiet --yes \
     'featuretools' \
     'deap' \
     'redis' \
+    'hiredis' \
     && conda clean -tipsy
 
 USER $NB_USER
