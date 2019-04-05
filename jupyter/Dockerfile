@@ -1,4 +1,4 @@
-docfrom jupyter/scipy-notebook
+FROM jupyter/scipy-notebook
 
 MAINTAINER "takemi.ohama" <takemi.ohama@ietty.co.jp>
 
