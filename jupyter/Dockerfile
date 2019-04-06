@@ -52,6 +52,9 @@ RUN conda install --quiet --yes \
 
 USER $NB_USER
 
-RUN /opt/conda/bin/pip install --user --upgrade pip graphviz mecab-python3 bash_kernel pybigquery redis hiredis
+RUN /opt/conda/bin/pip install --upgrade pip
+RUN /opt/conda/bin/pip install redis hiredis pybigquery
+RUN /opt/conda/bin/pip install graphviz mecab-python3 bash_kernel pybigquery
 RUN python -m bash_kernel.install 
 RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix
+
