@@ -1,6 +1,6 @@
-From ubuntu:bionic
+FROM ubuntu:bionic
 
-MAINTAINER "takemi.ohama" <takemi.ohama@ietty.co.jp>
+LABEL MAINTAINER "takemi.ohama" <takemi.ohama@ietty.co.jp>
 
 ENV TERM xterm
 RUN apt-get update -y && \
@@ -11,16 +11,11 @@ RUN apt-get update -y && \
     fonts-ipaexfont-gothic fonts-ipaexfont-mincho fonts-ubuntu-font-family-console \
     mysql-client libmysqlclient-dev 
 
-#C++とphantomjsのインストール
-RUN add-apt-repository ppa:ubuntu-toolchain-r/test && \
-    apt-get install -y g++-4.8 && \
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20
-
 WORKDIR /usr/local/share/
-RUN curl -sSL -O https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 && \
-    tar jxvf phantomjs-2.1.1-linux-x86_64.tar.bz2
+RUN curl -sSL -O https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.5.0-beta-linux-ubuntu-xenial-x86_64.tar.gz && \
+  tar zxvf phantomjs-2.5.0-beta-linux-ubuntu-xenial-x86_64.tar.gz
 
-RUN ln -s /usr/local/share/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/bin/phantomjs && \
+RUN ln -s /usr/local/share/phantomjs-2.5.0-beta-ubuntu-xenial/bin/phantomjs /usr/bin/phantomjs && \
     ln -sf /usr/share/zoneinfo/Japan /etc/localtime
 
 #rbenvとpluginのダウンロード
