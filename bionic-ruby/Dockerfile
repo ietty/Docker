@@ -1,15 +1,16 @@
 FROM ubuntu:bionic
 
-LABEL MAINTAINER "takemi.ohama" <takemi.ohama@ietty.co.jp>
+LABEL MAINTAINER "takemi.ohama" 
 
 ENV TERM xterm
 RUN apt-get update -y && \
-    apt-get install -y git curl wget \
-    g++ zlib1g-dev libssl-dev libreadline-dev libyaml-dev libxml2-dev \
-    libaio1 libxslt-dev libxml2-dev libqt4-dev imagemagick libffi-dev \
-    checkinstall libjpeg-dev aptitude software-properties-common redis-tools \
-    fonts-ipaexfont-gothic fonts-ipaexfont-mincho fonts-ubuntu-font-family-console \
-    mysql-client libmysqlclient-dev 
+  apt-get install -y git curl wget tzdata ca-certificates sudo ssh \
+  g++ zlib1g-dev libssl-dev libreadline-dev libyaml-dev libxml2-dev \
+  libaio1 libxslt-dev libxml2-dev libqt4-dev imagemagick libffi-dev \
+  checkinstall libjpeg-dev aptitude software-properties-common redis-tools \
+  fonts-ipaexfont-gothic fonts-ipaexfont-mincho fonts-ubuntu-font-family-console \
+  mysql-client libmysqlclient-dev locales language-pack-ja-base language-pack-ja \
+  && apt-get -y clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/local/share/
 RUN curl -sSL -O https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.5.0-beta-linux-ubuntu-xenial-x86_64.tar.gz && \
