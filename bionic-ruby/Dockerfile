@@ -63,9 +63,14 @@ RUN npm install -g npm-check-updates
 RUN printf "install: --no-document\ninstall: --no-document\n" > /home/docker/.gemrc && \
     bash -lc 'gem update --system && gem install bundler && gem install foreman'
 
+RUN mkdir -p /var/www && chown -R docker.docker /var/www
+
 EXPOSE 3000
 
 USER docker
 WORKDIR /home/docker
+ENV RBENV_SHELL bash
+ENV RBENV_ROOT /usr/local/rbenv
+ENV PATH=/usr/local/rbenv/shims:/usr/local/rbenv/bin:$PATH
 
 CMD ["tail","-f","/dev/null"]
