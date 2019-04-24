@@ -2,6 +2,8 @@ FROM ubuntu:bionic
 
 LABEL MAINTAINER "takemi.ohama" 
 
+ENV DEBIAN_FRONTEND noninteractive
+
 ENV TERM xterm
 RUN apt-get update -y && \
   apt-get install -y git curl wget tzdata ca-certificates sudo ssh \
