@@ -5,8 +5,8 @@ LABEL MAINTAINER "takemi.ohama"
 ENV DEBIAN_FRONTEND noninteractive
 ENV TERM xterm
 RUN apt-get update -y && \
-  apt-get install -y git curl wget tzdata ca-certificates sudo ssh nodejs npm vim \
-  g++ zlib1g-dev libssl-dev libreadline-dev libyaml-dev libxml2-dev \
+  apt-get install -y git curl wget tzdata ca-certificates sudo ssh vim \
+  g++ zlib1g-dev libreadline-dev libyaml-dev libxml2-dev npm \
   libaio1 libxslt-dev libxml2-dev libqt4-dev imagemagick libffi-dev \
   checkinstall libjpeg-dev aptitude software-properties-common redis-tools \
   fonts-ipaexfont-gothic fonts-ipaexfont-mincho fonts-ubuntu-font-family-console \
