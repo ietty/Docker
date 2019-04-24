@@ -3,10 +3,9 @@ FROM ubuntu:bionic
 LABEL MAINTAINER "takemi.ohama" 
 
 ENV DEBIAN_FRONTEND noninteractive
-
 ENV TERM xterm
 RUN apt-get update -y && \
-  apt-get install -y git curl wget tzdata ca-certificates sudo ssh \
+  apt-get install -y git curl wget tzdata ca-certificates sudo ssh nodejs npm vim \
   g++ zlib1g-dev libssl-dev libreadline-dev libyaml-dev libxml2-dev \
   libaio1 libxslt-dev libxml2-dev libqt4-dev imagemagick libffi-dev \
   checkinstall libjpeg-dev aptitude software-properties-common redis-tools \
@@ -53,14 +52,12 @@ ENV CONFIGURE_OPTS --disable-install-doc
 RUN su -l root -c 'rbenv install 2.4.5 -v && rbenv rehash && rbenv global 2.4.5'
 
 #npmインストール
-RUN apt-get install -y nodejs npm && \
-    npm cache clean && \
+RUN npm cache clean && \
     npm install n -g && \
     npm update -g npm && \
     n 5.5.0  && \
     apt-get purge -y nodejs npm
 RUN npm install -g npm-check-updates
-RUN apt-get -y clean && rm -rf /var/lib/apt/lists/*
 
 #gem関連
 RUN printf "install: --no-document\ninstall: --no-document\n" > /home/docker/.gemrc && \
@@ -70,6 +67,5 @@ EXPOSE 3000
 
 USER docker
 WORKDIR /home/docker
-
 
 CMD ["tail","-f","/dev/null"]
