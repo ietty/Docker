@@ -48,6 +48,7 @@ RUN conda install --quiet --yes \
     'uwsgi' \
     'featuretools' \
     'deap' \
+    'lime' \
     && conda clean -tipsy
 
 USER $NB_USER
