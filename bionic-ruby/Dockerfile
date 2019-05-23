@@ -11,13 +11,14 @@ RUN apt-get update -y && \
   checkinstall libjpeg-dev aptitude software-properties-common redis-tools \
   fonts-ipaexfont-gothic fonts-ipaexfont-mincho fonts-ubuntu-font-family-console \
   mysql-client libmysqlclient-dev locales language-pack-ja-base language-pack-ja \
+  libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev \
   && apt-get -y clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/local/share/
-RUN curl -sSL -O https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.5.0-beta-linux-ubuntu-xenial-x86_64.tar.gz && \
-  tar zxvf phantomjs-2.5.0-beta-linux-ubuntu-xenial-x86_64.tar.gz
+RUN wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 && \
+    tar zxvf phantomjs-2.1.1-linux-x86_64.tar.bz2
 
-RUN ln -s /usr/local/share/phantomjs-2.5.0-beta-ubuntu-xenial/bin/phantomjs /usr/bin/phantomjs && \
+RUN ln -s /usr/local/share/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/bin/phantomjs && \
     ln -sf /usr/share/zoneinfo/Japan /etc/localtime
 
 #rbenvとpluginのダウンロード
