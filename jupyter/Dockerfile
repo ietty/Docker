@@ -36,7 +36,7 @@ RUN conda install --quiet --yes \
     'pydata-google-auth' \
     'pandas-gbq' \
     'gensim' \ 
-    'jupyterlab' \ 
+    'jupyterlab=1.0.1' \ 
     'jupyterhub' \ 
     'missingno' \
     'xgboost' \
