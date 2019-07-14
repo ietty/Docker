@@ -38,6 +38,7 @@ RUN conda install --quiet --yes \
     'gensim' \ 
     'jupyterlab' \ 
     'jupyterhub' \ 
+    'missingno' \
     'xgboost' \
     'lightgbm' \
     'tensorflow' \
