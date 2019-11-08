@@ -7,7 +7,7 @@ EXPOSE 22
 RUN apt-get update && apt-get install -y apt-utils && \
     apt-get install -y git vim wget mysql-client ssh libreadline-dev curl \
     bzip2 ca-certificates sudo locales language-pack-ja-base language-pack-ja \
-    gcc golang\
+    gcc golang \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -45,6 +45,7 @@ RUN conda install --quiet --yes conda && \
 RUN conda install --quiet --yes \
     'pandas' \
     'conda-build' \
+    'sqlalchemy' \
     'readline' \
     'mysql-connector-python' \
     'pymysql' \
@@ -52,3 +53,6 @@ RUN conda install --quiet --yes \
     'jupyterlab=0.35.5' \ 
     'missingno' \
     && conda clean -tipsy
+
+RUN go get github.com/jinzhu/gorm github.com/jinzhu/gorm/dialects/mysql \
+           github.com/joho/godotenv googlemaps.github.io/maps github.com/pkg/errors 
