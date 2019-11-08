@@ -49,21 +49,6 @@ RUN conda install --quiet --yes \
     'mysql-connector-python' \
     'pymysql' \
     'pydata-google-auth' \
-    'pandas-gbq' \
-    'gensim' \ 
     'jupyterlab=0.35.5' \ 
-    'jupyterhub' \ 
     'missingno' \
-    'xgboost' \
-    'lightgbm' \
-    'tensorflow' \
-    'seaborn' \
-    'swig' \
-    'imbalanced-learn' \
-    'joblib' \
-    'flask' \
-    'uwsgi' \
-    'featuretools' \
-    'deap' \
-    'lime' \
     && conda clean -tipsy
