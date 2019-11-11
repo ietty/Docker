@@ -1,12 +1,13 @@
-From ubuntu:xenial
+From ubuntu:focal
 
 MAINTAINER takemi.ohama<takemi.ohama@gmail.com>
 
 EXPOSE 22
 
+ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y apt-utils && \
-    apt-get install -y git vim wget pssh mysql-client ssh libreadline-dev curl \
-    bzip2 ca-certificates sudo locales language-pack-ja-base language-pack-ja \
+    apt-get install -y git vim wget mysql-client ssh libreadline-dev curl \
+    ca-certificates sudo locales language-pack-ja-base language-pack-ja \
     gcc \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
