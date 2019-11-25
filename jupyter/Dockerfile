@@ -39,6 +39,9 @@ RUN conda install --quiet --yes \
     'jupyterlab=0.35.5' \ 
     'jupyterhub' \ 
     'missingno' \
+    && conda clean -tipsy   
+
+RUN conda install --quiet --yes \
     'xgboost' \
     'lightgbm' \
     'tensorflow' \
