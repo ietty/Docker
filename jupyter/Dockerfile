@@ -38,7 +38,6 @@ RUN conda install --quiet --yes \
     'gensim' \ 
     'jupyterlab=0.35.5' \ 
     'jupyterhub' \ 
-    'missingno' \
     && conda clean -tipsy   
 
 RUN conda install --quiet --yes \
