@@ -30,13 +30,12 @@ RUN update-locale LANGUAGE=ja_JP:ja LANG=ja_JP.UTF-8
 # Install Python 3 packages
 RUN conda install --quiet --yes \
     'conda-build' \
-    'readline' \
     'mysql-connector-python' \
     'pymysql' \
     'pydata-google-auth' \
     'pandas-gbq' \
     'gensim' \ 
-    'jupyterlab=0.35.5' \ 
+    'jupyterlab' \ 
     'jupyterhub' \ 
     && conda clean -tipsy   
 
@@ -58,8 +57,7 @@ RUN conda install --quiet --yes \
 USER $NB_USER
 
 RUN /opt/conda/bin/pip install --upgrade pip
-RUN /opt/conda/bin/pip install redis hiredis pybigquery
-RUN /opt/conda/bin/pip install graphviz mecab-python3 bash_kernel pybigquery
+RUN /opt/conda/bin/pip install redis hiredis pybigquery bash_kernel
 RUN python -m bash_kernel.install 
 RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix
 
