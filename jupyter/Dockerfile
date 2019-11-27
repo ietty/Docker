@@ -29,35 +29,37 @@ RUN update-locale LANGUAGE=ja_JP:ja LANG=ja_JP.UTF-8
 
 # Install Python 3 packages
 RUN conda install --quiet --yes \
-    'conda-build' \
-    'mysql-connector-python' \
-    'pymysql' \
-    'pydata-google-auth' \
-    'pandas-gbq' \
-    'gensim' \ 
-    'jupyterlab' \ 
-    'jupyterhub' \ 
-    && conda clean -tipsy   
+  'protobuf=3.6.*' \
+  'conda-build' \
+  'mysql-connector-python' \
+  'pymysql' \
+  'pydata-google-auth' \
+  'pandas-gbq' \
+  'jupyterlab' \ 
+  'jupyterhub' \ 
+  && conda build purge-all
 
 RUN conda install --quiet --yes \
-    'xgboost' \
-    'lightgbm' \
-    'tensorflow' \
-    'seaborn' \
-    'swig' \
-    'imbalanced-learn' \
-    'joblib' \
-    'flask' \
-    'uwsgi' \
-    'featuretools' \
-    'deap' \
-    'lime' \
-    && conda clean -tipsy
+  'gensim' \ 
+  'xgboost' \
+  'lightgbm' \
+  'tensorflow' \
+  'seaborn' \
+  'swig' \
+  'imbalanced-learn' \
+  'joblib' \
+  'featuretools' \
+  'deap' \
+  'lime' \
+  && conda build purge-all
 
 USER $NB_USER
 
 RUN /opt/conda/bin/pip install --upgrade pip
-RUN /opt/conda/bin/pip install redis hiredis pybigquery bash_kernel
-RUN python -m bash_kernel.install 
-RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix
-
+RUN /opt/conda/bin/pip install redis hiredis pybigquery bash_kernel jupyter_contrib_nbextensions
+RUN python -m bash_kernel.install & \
+  jupyter contrib nbextension install --user & \
+  jupyter nbextension enable codefolding/main & \
+  jupyter contrib nbextensions migrate & \
+  jupyter nbextension enable --py widgetsnbextension --sys-prefix
+  
