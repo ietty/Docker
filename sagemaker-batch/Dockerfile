@@ -15,8 +15,7 @@ RUN conda install --quiet --yes \
     'sagemaker-python-sdk' \
     'joblib' \
     'aiobotocore' \
-    'nest_asyncio' \
-    'pickle' \
+    'nest-asyncio' \
     && conda clean -tipsy
 
 ENTRYPOINT ["tail","-f","/dev/null"]
