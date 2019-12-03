@@ -13,6 +13,10 @@ RUN conda install --quiet --yes \
     'sqlalchemy' \
     'boto3' \
     'sagemaker-python-sdk' \
+    'joblib' \
+    'aiobotocore' \
+    'nest_asyncio' \
+    'pickle' \
     && conda clean -tipsy
 
 ENTRYPOINT ["tail","-f","/dev/null"]
