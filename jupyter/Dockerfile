@@ -52,6 +52,8 @@ RUN conda install --quiet --yes \
   'xgboost' \
   'lightgbm' \
   'tensorflow' \
+  'keras' \
+  'keras-preprocessing' \
   'mxnet' \
   'seaborn' \
   'swig' \
