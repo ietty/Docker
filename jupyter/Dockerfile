@@ -61,6 +61,7 @@ RUN conda install --quiet --yes \
   'deap' \
   'lime' \
   'google-cloud-language' \
+  'google-cloud-translate' \
   && conda build purge-all
 
 RUN /opt/conda/bin/pip install --upgrade pip
