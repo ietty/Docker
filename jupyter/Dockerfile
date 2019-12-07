@@ -60,6 +60,9 @@ RUN conda install --quiet --yes \
   'featuretools' \
   'deap' \
   'lime' \
+  && conda build purge-all
+
+RUN conda install --quiet --yes \
   'google-cloud-language' \
   'google-cloud-translate' \
   && conda build purge-all
