@@ -27,8 +27,8 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 
 RUN update-locale LANGUAGE=ja_JP:ja LANG=ja_JP.UTF-8
 
-RUN wget https://dl.google.com/go/go1.13.5.linux-amd64.tar.gz
-RUN tar -C /usr/local -xzf go1.11.5.linux-amd64.tar.gz
+RUN wget -nv https://dl.google.com/go/go1.13.5.linux-amd64.tar.gz
+RUN tar -C /usr/local -xzf go1.13.5.linux-amd64.tar.gz
 ENV PATH $PATH:/usr/local/go/bin
 
 USER $NB_USER
@@ -52,6 +52,7 @@ RUN conda install --quiet --yes \
   'xgboost' \
   'lightgbm' \
   'tensorflow' \
+  'mxnet' \
   'seaborn' \
   'swig' \
   'imbalanced-learn' \
@@ -59,6 +60,7 @@ RUN conda install --quiet --yes \
   'featuretools' \
   'deap' \
   'lime' \
+  'google-cloud-language' \
   && conda build purge-all
 
 RUN /opt/conda/bin/pip install --upgrade pip
