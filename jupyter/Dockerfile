@@ -27,6 +27,8 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 
 RUN update-locale LANGUAGE=ja_JP:ja LANG=ja_JP.UTF-8
 
+USER $NB_USER
+
 # Install Python 3 packages
 RUN conda install --quiet --yes \
   'protobuf=3.6.*' \
@@ -53,8 +55,6 @@ RUN conda install --quiet --yes \
   'lime' \
   && conda build purge-all
 
-USER $NB_USER
-
 RUN /opt/conda/bin/pip install --upgrade pip
 RUN /opt/conda/bin/pip install redis hiredis pybigquery bash_kernel jupyter_contrib_nbextensions
 RUN python -m bash_kernel.install & \
@@ -62,4 +62,4 @@ RUN python -m bash_kernel.install & \
   jupyter nbextension enable codefolding/main & \
   jupyter contrib nbextensions migrate & \
   jupyter nbextension enable --py widgetsnbextension --sys-prefix
-  
+
