@@ -27,7 +27,13 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 
 RUN update-locale LANGUAGE=ja_JP:ja LANG=ja_JP.UTF-8
 
+RUN wget https://dl.google.com/go/go1.13.5.linux-amd64.tar.gz
+RUN tar -C /usr/local -xzf go1.11.5.linux-amd64.tar.gz
+ENV PATH $PATH:/usr/local/go/bin
+
 USER $NB_USER
+
+ENV PATH $PATH:/usr/local/go/bin
 
 # Install Python 3 packages
 RUN conda install --quiet --yes \
@@ -56,10 +62,11 @@ RUN conda install --quiet --yes \
   && conda build purge-all
 
 RUN /opt/conda/bin/pip install --upgrade pip
-RUN /opt/conda/bin/pip install redis hiredis pybigquery bash_kernel jupyter_contrib_nbextensions
+RUN /opt/conda/bin/pip install redis hiredis pybigquery bash_kernel jupyter_contrib_nbextensions environment_kernels
 RUN python -m bash_kernel.install & \
   jupyter contrib nbextension install --user & \
   jupyter nbextension enable codefolding/main & \
   jupyter contrib nbextensions migrate & \
+  jupyter labextension install @yunabe/lgo_extension & \
   jupyter nbextension enable --py widgetsnbextension --sys-prefix
 
