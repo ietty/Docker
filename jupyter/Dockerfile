@@ -1,6 +1,6 @@
 FROM jupyter/scipy-notebook
 
-MAINTAINER "takemi.ohama" <takemi.ohama@ietty.co.jp>
+LABEL MAINTAINER takemi.ohama@ietty.co.jp
 
 USER root
 
@@ -49,16 +49,10 @@ RUN conda install --quiet --yes \
 
 RUN conda install --quiet --yes \
   'gensim' \ 
-  'xgboost' \
   'lightgbm' \
-  'tensorflow' \
-  'keras' \
-  'keras-preprocessing' \
-  'mxnet' \
   'seaborn' \
   'swig' \
   'imbalanced-learn' \
-  'joblib' \
   'featuretools' \
   'deap' \
   'lime' \
@@ -67,6 +61,12 @@ RUN conda install --quiet --yes \
 RUN conda install --quiet --yes \
   'google-cloud-language' \
   'google-cloud-translate' \
+  && conda build purge-all
+
+RUN conda install --quiet --yes \
+  'tensorflow' \
+  'keras' \
+  'keras-preprocessing' \
   && conda build purge-all
 
 RUN /opt/conda/bin/pip install --upgrade pip
