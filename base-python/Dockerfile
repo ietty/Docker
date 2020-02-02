@@ -1,6 +1,6 @@
 From ubuntu:focal
 
-MAINTAINER takemi.ohama<takemi.ohama@gmail.com>
+LABEL MAINTAINER takemi.ohama@gmail.com
 
 EXPOSE 22
 
