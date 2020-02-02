@@ -45,22 +45,28 @@ RUN conda install --quiet --yes \
   'pandas-gbq' \
   'jupyterlab' \ 
   'jupyterhub' \ 
+  'nest-asyncio' \
   && conda build purge-all
 
 RUN conda install --quiet --yes \
   'gensim' \ 
   'lightgbm' \
   'seaborn' \
+  'joblib' \
   'swig' \
   'imbalanced-learn' \
   'featuretools' \
+  'emoji' \
   'deap' \
   'lime' \
+  'tqdm' \
   && conda build purge-all
 
 RUN conda install --quiet --yes \
+  'google-auth' \
   'google-cloud-language' \
   'google-cloud-translate' \
+  'google-cloud-storage' \
   && conda build purge-all
 
 RUN conda install --quiet --yes \
