@@ -6,6 +6,6 @@ ENV RDS_ENDPOINT=${RDS_ENDPOINT} \
     RDS_PASSWORD=${RDS_PASSWORD} \
     ES_ENDPOINT=${ES_ENDPOINT}
 
-#RUN rm -rf /usr/share/logstash/pipeline
-#COPY pipeline /usr/share/logstash/pipeline
+RUN rm -f /usr/share/logstash/pipeline/*
+#COPY pipeline/main.conf /usr/share/logstash/pipeline/main.conf
 COPY mysql-connector-java-8.0.19.jar /usr/share/logstash/mysql-connector-java-8.0.19.jar
