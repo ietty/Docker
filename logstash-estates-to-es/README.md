@@ -4,18 +4,12 @@ Logstash の pipeline 機能を利用して指定のテーブルデータを Ela
 
 
 ## PreRequirement
-- .env for [staging|production]
-    - .env.example に以下項目を設定してください
-    ```
-    RDS_ENDPOINT=
-    RDS_DATABASE=
-    RDS_USERNAME=
-    RDS_PASSWORD=
-    ES_ENDPOINT=
-    ```
-
-- image build 
-    - `bash ./build.sh ${CONTAINER_REGISTRY} ${TAG_NAME}` 
+- volume `logstash_env` が整備されていることを確認してください
+    - 状況確認方法: 
+        1. 実体パス確認
+            - `docker volume ls --format "{{.Name}} : {{.Driver}} : {{.Mountpoint}}" | grep logstash_env`
+        1. そのディレクトリに cd して ls -la
+        1. export.sh と .env.[staging|production] が存在して内容が妥当なことを確認する
 
 
 ## Note

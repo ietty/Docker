@@ -17,5 +17,5 @@ RUN rm -f /usr/share/logstash/pipeline/*
 #COPY pipelines.yml /usr/share/logstash/config/pipelines.yml
 COPY mysql-connector-java-8.0.19.jar /usr/share/logstash/mysql-connector-java-8.0.19.jar
 
-COPY export.sh /tmp/export.sh
-COPY .env.example /tmp/.env
+#COPY export.sh /tmp/export.sh
+#COPY .env.example /tmp/.env
