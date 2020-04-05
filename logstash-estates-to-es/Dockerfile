@@ -22,6 +22,9 @@ RUN curl -Lo - https://artifacts.elastic.co/downloads/logstash/logstash-7.6.2.ta
     find /usr/share/logstash -type d -exec chmod g+s {} \; && \
     ln -s /usr/share/logstash /opt/logstash
 
+# customize 1
+COPY mysql-connector-java-8.0.19.jar /usr/share/logstash/mysql-connector-java-8.0.19.jar
+
 WORKDIR /usr/share/logstash
 
 ENV ELASTIC_CONTAINER true
@@ -35,12 +38,23 @@ ADD config/log4j2.properties config/
 ADD pipeline/default.conf pipeline/logstash.conf
 RUN chown --recursive logstash:root config/ pipeline/
 
+# customize 2
+RUN rm -f pipeline/*
+
+
 # Ensure Logstash gets a UTF-8 locale by default.
 ENV LANG='en_US.UTF-8' LC_ALL='en_US.UTF-8'
 
 # Place the startup wrapper script.
 ADD bin/docker-entrypoint /usr/local/bin/
 RUN chmod 0755 /usr/local/bin/docker-entrypoint
+
+
+# customize 3-1
+ADD config/.env config/
+RUN chown logstash:logstash config/.env
+RUN chmod 0666 config/.env
+
 
 USER 1000
 
