@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y apt-utils && \
 RUN sed -i -e "s/# ja_JP.UTF-8 UTF-8/ja_JP.UTF-8 UTF-8/" /etc/locale.gen
 RUN locale-gen
 RUN update-locale LANG=ja_JP.UTF-8 LANGUAGE="ja_JP:ja"
+ENV LANG=ja_JP.UTF-8 
 
 RUN pip3 install pandas sqlalchemy requests mysql-connector-python awscli 
 RUN echo "complete -C aws_completer aws" >> /etc/profile
@@ -53,7 +54,7 @@ RUN embulk gem install embulk-input-http embulk-input-mysql embulk-input-google_
     embulk-output-gcs embulk-output-google_spreadsheets embulk-output-elasticsearch5 embulk-output-redis \
     embulk-filter-column embulk-filter-ruby_proc embulk-filter-row embulk-filter-add_time \
     embulk-filter-mysql embulk-parser-jsonl embulk-formatter-jsonl embulk-filter-unpivot \
-    embulk-filter-rearrange
+    embulk-filter-rearrange embulk-filter-concat 
 
 EXPOSE 65432 65433
 

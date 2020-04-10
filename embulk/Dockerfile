@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 LABEL MAINTAINER=takemi.ohama<takemi.ohama@gmail.com>
 
@@ -23,10 +23,16 @@ RUN useradd -m -s /bin/bash docker && \
     usermod -G users docker && \
     usermod -G users root && \
     echo '%users ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers && \
+    echo "Set disable_coredump false" >> /etc/sudo.conf && \
     mkdir /home/docker/.ssh && chown docker.docker /home/docker/.ssh
 
-RUN wget -q "https://dl.embulk.org/embulk-latest.jar" -O /usr/local/bin/embulk
+RUN mkdir /var/run/sshd && \
+    sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
+RUN wget -q "https://github.com/embulk/embulk/releases/download/v0.10.1/embulk-0.10.1.jar" -O /usr/local/bin/embulk
 RUN chmod +x /usr/local/bin/embulk
+
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/jdk/bin/java 
 
 RUN embulk gem install embulk-input-http embulk-input-mysql embulk-input-google_analytics \
     embulk-input-google_spreadsheets embulk-input-redash \
@@ -34,4 +40,5 @@ RUN embulk gem install embulk-input-http embulk-input-mysql embulk-input-google_
     embulk-output-gcs embulk-output-google_spreadsheets embulk-output-elasticsearch5 embulk-output-redis \
     embulk-filter-column embulk-filter-ruby_proc embulk-filter-row embulk-filter-add_time \
     embulk-filter-mysql embulk-parser-jsonl embulk-formatter-jsonl embulk-filter-unpivot \
-    embulk-filter-concat
+    embulk-filter-rearrange embulk-filter-concat 
+    
