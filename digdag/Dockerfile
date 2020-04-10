@@ -22,6 +22,7 @@ RUN useradd -m -s /bin/bash docker && \
     usermod -G users docker && \
     usermod -G users root && \
     echo '%users ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers && \
+    echo "Set disable_coredump false" >> /etc/sudo.conf && \
     mkdir /home/docker/.ssh && chown docker.docker /home/docker/.ssh
 
 RUN mkdir /var/run/sshd && \
