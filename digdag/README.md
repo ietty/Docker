@@ -1,3 +1,3 @@
-# ietty/centos7-ruby
+# ietty/digdag
 
 digdag/embulk server
