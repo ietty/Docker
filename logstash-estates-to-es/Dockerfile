@@ -50,10 +50,10 @@ ADD bin/docker-entrypoint /usr/local/bin/
 RUN chmod 0755 /usr/local/bin/docker-entrypoint
 
 
-# customize 3-1
-ADD config/.env config/
-RUN chown logstash:logstash config/.env
-RUN chmod 0666 config/.env
+## customize 3-1
+#ADD config/.env config/
+#RUN chown logstash:logstash config/.env
+#RUN chmod 0666 config/.env
 
 
 USER 1000
