@@ -52,6 +52,9 @@ RUN conda install --quiet --yes \
     'pydata-google-auth' \
     'jupyterlab=0.35.5' \ 
     'missingno' \
+    'numpy' \
+    'boto3' \
+    'requests' \
     && conda clean -tipsy
 
 RUN go get github.com/jinzhu/gorm github.com/jinzhu/gorm/dialects/mysql \
