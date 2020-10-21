@@ -1,5 +1,4 @@
-FROM jupyter/scipy-notebook
-
+FROM jupyter/scipy-notebook:414b5d749704
 LABEL MAINTAINER takemi.ohama@ietty.co.jp
 
 USER root
@@ -12,7 +11,6 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     language-pack-ja-base language-pack-ja fonts-mplus \
     ffmpeg graphviz mecab libmecab-dev mecab-ipadic-utf8
 
-#RUN export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
 RUN export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
   echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
   curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - && \
@@ -57,9 +55,6 @@ RUN conda install --quiet --yes \
   'imbalanced-learn' \
   'featuretools' \
   'emoji' \
-  'deap' \
-  'lime' \
-  'tqdm' \
   && conda build purge-all
 
 RUN conda install --quiet --yes \
@@ -71,8 +66,8 @@ RUN conda install --quiet --yes \
 
 RUN conda install --quiet --yes \
   'tensorflow' \
-  'keras' \
-  'keras-preprocessing' \
+  'uwsgi' \
+  'flask' \
   && conda build purge-all
 
 RUN /opt/conda/bin/pip install --upgrade pip
