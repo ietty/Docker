@@ -5,6 +5,7 @@ USER root
 RUN conda install --quiet --yes \
     'lightgbm' \
     'imbalanced-learn' \
+    'catboost' \
     && conda build purge-all
 
 RUN conda install --quiet --yes \

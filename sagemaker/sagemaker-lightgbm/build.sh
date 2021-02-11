@@ -1,5 +1,5 @@
 name=`basename ${PWD}`
-tag=`date +%Y%m%d`01
+tag=`date +%Y%m%d`02
 
 registry=ietty
 public_ecr=public.ecr.aws/b5w9v1j5
