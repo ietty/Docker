@@ -1,5 +1,5 @@
 name=`basename ${PWD}`
-tag=`date +%Y%m%d`02
+tag=`date +%Y%m%d`01
 
 registry=ietty
 public_ecr=public.ecr.aws/b5w9v1j5
@@ -30,8 +30,16 @@ function pushPrivateECR(){
     echo "pushed: ${private_ecr}/${name}:${tag}"
 }
 
+function createStudioApp(){
+    profile=${1:-default}
+    region=${2:-us-west-2}
+    aws --profile=${profile} --region ${region} sagemaker create-image-version \
+    --base-image ${private_ecr}/${name}:${tag} \
+    --image-name ${name}
+}
+
 
 #pushDockerHub
 #pushPublicECR
 pushPrivateECR
-
+createStudioApp

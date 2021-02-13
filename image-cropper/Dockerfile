@@ -1,6 +1,6 @@
 FROM ubuntu:18.10
 
-MAINTAINER takemi.ohama <takemi.ohama@gmail.com>
+LABEL MAINTAINER takemi.ohama@gmail.com
 LABEL com.amazonaws.sagemaker.capabilities.accept-bind-to-port=true
 
 ENV DEBIAN_FRONTEND noninteractive
