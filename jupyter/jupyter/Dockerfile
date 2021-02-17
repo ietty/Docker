@@ -52,7 +52,7 @@ RUN conda install --quiet --yes \
   'seaborn' \
   'joblib' \
   'swig' \
-  'imbalasnced-learn' \
+  'imbalanced-learn' \
   'featuretools' \
   'emoji' \
   && conda build purge-all
