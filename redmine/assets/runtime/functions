@@ -1,0 +1,323 @@
+#!/bin/bash
+set -e
+source ${REDMINE_RUNTIME_ASSETS_DIR}/env-defaults
+
+### utils
+exec_as_redmine() {
+  if [[ $(whoami) == ${REDMINE_USER} ]]; then
+    $@
+  else
+    sudo -HEu ${REDMINE_USER} "$@"
+  fi
+}
+
+# Compares two version strings `a` and `b`
+# Returns
+#   - negative integer, if `a` is less than `b`
+#   - 0, if `a` and `b` are equal
+#   - non-negative integer, if `a` is greater than `b`
+vercmp() {
+  expr '(' "$1" : '\([^.]*\)' ')' '-' '(' "$2" : '\([^.]*\)' ')' '|' \
+       '(' "$1.0" : '[^.]*[.]\([^.]*\)' ')' '-' '(' "$2.0" : '[^.]*[.]\([^.]*\)' ')' '|' \
+       '(' "$1.0.0" : '[^.]*[.][^.]*[.]\([^.]*\)' ')' '-' '(' "$2.0.0" : '[^.]*[.][^.]*[.]\([^.]*\)' ')' '|' \
+       '(' "$1.0.0.0" : '[^.]*[.][^.]*[.][^.]*[.]\([^.]*\)' ')' '-' '(' "$2.0.0.0" : '[^.]*[.][^.]*[.][^.]*[.]\([^.]*\)' ')'
+}
+
+IMAGE_VERSION=$(cat /VERSION)
+
+### called from initialize_system
+initialize_logdir() {
+  echo 'initialize_logdir...'
+
+  mkdir -p ${REDMINE_LOG_DIR}/redmine
+  chmod -R u+rw,go+r ${REDMINE_LOG_DIR}/redmine
+  chown -R ${REDMINE_USER}: ${REDMINE_LOG_DIR}/redmine
+}
+
+initialize_datadir() {
+  echo "Initializing datadir..."
+  chmod -R u+rw,go+r ${REDMINE_DATA_DIR}
+  chown -R ${REDMINE_USER}: ${REDMINE_DATA_DIR}
+
+  # create plugins directory
+  mkdir -p ${REDMINE_PLUGINS_DIR}
+  chmod -R u+rw,go+r ${REDMINE_PLUGINS_DIR}
+  chown -R ${REDMINE_USER}: ${REDMINE_PLUGINS_DIR}
+
+  # create themes directory
+  mkdir -p ${REDMINE_THEMES_DIR}
+  chmod -R u+rw,go+r ${REDMINE_THEMES_DIR}
+  chown -R ${REDMINE_USER}: ${REDMINE_THEMES_DIR}
+
+  # create attachments directory
+  mkdir -p ${REDMINE_ATTACHMENTS_DIR}
+  chmod -R u+rw,go+r ${REDMINE_ATTACHMENTS_DIR}
+  chown -R ${REDMINE_USER}: ${REDMINE_ATTACHMENTS_DIR}
+
+  # create backups directory | wip::一応ディレクトリだけ用意
+  mkdir -p ${REDMINE_BACKUPS_DIR}
+  chmod -R u+rw,go+r ${REDMINE_BACKUPS_DIR}
+  chown -R ${REDMINE_USER}: ${REDMINE_BACKUPS_DIR}
+
+  if [[ -d /redmine/files ]]; then # deprecated
+    echo "WARNING: "
+    echo "  The data volume path has now been changed to ${REDMINE_DATA_DIR}."
+    echo "  Refer http://git.io/H59-lg for migration information."
+    exit 1
+  fi
+
+  # create dotfiles directory
+  mkdir -p ${REDMINE_DOTFILES_DIR}
+  chmod -R u+rw,go+r ${REDMINE_DOTFILES_DIR}
+  chown -R ${REDMINE_USER}: ${REDMINE_DOTFILES_DIR}
+
+  mkdir -p ${REDMINE_DOTFILES_DIR}/.ssh
+  chmod -R u+rw,go-rwx ${REDMINE_DOTFILES_DIR}/.ssh
+  chown -R ${REDMINE_USER}: ${REDMINE_DOTFILES_DIR}/.ssh
+
+  mkdir -p ${REDMINE_DOTFILES_DIR}/.subversion
+  chmod -R u+rw,go+r ${REDMINE_DOTFILES_DIR}/.subversion
+  chown -R ${REDMINE_USER}: ${REDMINE_DOTFILES_DIR}/.subversion
+
+  # create tmp directory
+  mkdir -p ${REDMINE_DATA_DIR}/tmp
+  chmod -R u+rw,go+r ${REDMINE_DATA_DIR}/tmp
+  chown -R ${REDMINE_USER}: ${REDMINE_DATA_DIR}/tmp
+}
+
+generate_ssh_client_keys() {
+  if [[ ! -e ${REDMINE_DOTFILES_DIR}/.ssh/id_rsa || ! -e ${REDMINE_DOTFILES_DIR}/.ssh/id_rsa.pub ]]; then
+    echo "Generating OpenSSH client keys..."
+    exec_as_redmine rm -rf ${REDMINE_DOTFILES_DIR}/.ssh/id_rsa ${REDMINE_DOTFILES_DIR}/.ssh/id_rsa.pub
+    exec_as_redmine ssh-keygen -qt rsa -N '' -f ${REDMINE_DOTFILES_DIR}/.ssh/id_rsa
+  fi
+
+  # ensure existing host keys have the right permissions
+  chmod 0600 ${REDMINE_DOTFILES_DIR}/.ssh/id_rsa ${REDMINE_DOTFILES_DIR}/.ssh/id_rsa.pub
+  chmod 0700 ${REDMINE_DOTFILES_DIR}/.ssh
+}
+
+symlink_dotfiles() {
+  echo "Symlinking dotfiles..."
+  for dotfile in $(find ${REDMINE_DOTFILES_DIR} -maxdepth 1 -type d -not -path ${REDMINE_DOTFILES_DIR})
+  do
+    exec_as_redmine rm -rf ${REDMINE_HOME}/$(basename ${dotfile})
+    exec_as_redmine ln -sf ${dotfile} ${REDMINE_HOME}/$(basename ${dotfile})
+  done
+}
+
+### called from configure_redmine
+check_database_connection() {
+  if [ "$DB_SKIP_CHECK" = "true" ]; then
+    echo
+    echo "Skipping :check_database_connection"
+    return 0
+  fi
+
+  prog="mysqladmin -h ${DB_HOST} -P ${DB_PORT:-3306} -u ${DB_USER} ${DB_PASS:+-p$DB_PASS} status"
+  timeout=60
+  while ! exec_as_redmine ${prog} >/dev/null 2>&1
+  do
+    timeout=$((timeout - 1))
+    if [[ $timeout -eq 0 ]]; then
+      echo
+      echo "Could not connect to database server. Aborting..."
+      return 1
+    fi
+    echo -n "."
+    sleep 1
+  done
+  echo
+}
+
+configure_database() {
+  echo 'configure_database...'
+
+  DB_ADAPTER=${DB_ADAPTER:-mysql2}
+  DB_ENCODING=${DB_ENCODING:-utf8mb4}
+  DB_RECONNECT=${DB_RECONNECT:-false}
+  DB_DATABASE=${DB_NAME:-redmine_redmine}
+  DB_HOST=${DB_HOST:-mysql}
+  DB_PORT=${DB_PORT:-3306}
+  DB_USERNAME=${DB_USER:-root}
+  DB_PASSWORD=${DB_PASS:-hogefuga}
+  DB_POOL=${DB_POOL:-5}
+
+  REDMINE_DATABASE_CONFIG="${REDMINE_INSTALL_DIR}/config/database.yml"
+
+  # database.yml作成
+  echo "$RAILS_ENV:" > ${REDMINE_DATABASE_CONFIG}
+  for var in \
+    adapter \
+    encoding \
+    reconnect \
+    database \
+    host \
+    port \
+    username \
+    password \
+    pool \
+  ; do
+    env="DB_${var^^}"
+    val="${!env}"
+    [ -n "$val" ] || continue
+    echo "  $var: \"$val\"" >> ${REDMINE_DATABASE_CONFIG}
+  done
+
+  check_database_connection
+}
+
+configure_environments() {
+  echo 'configure_secret...'
+
+  REDMINE_SECRETS_CONFIG="${REDMINE_INSTALL_DIR}/config/secrets.yml"
+  ADDITIONAL_ENVIRONMENT="${REDMINE_INSTALL_DIR}/config/additional_environment.rb"
+
+  echo "$RAILS_ENV:" > ${REDMINE_SECRETS_CONFIG}
+  echo "  secret_key_base: "${REDMINE_SECRET_KEY_BASE} >> ${REDMINE_SECRETS_CONFIG}
+  chown ${REDMINE_USER}:${REDMINE_USER} ${REDMINE_SECRETS_CONFIG}
+
+  echo 'configure_add_environments...'
+  # logを標準出力するための魔術
+  echo 'config.logger = Logger.new(STDOUT)' > ${ADDITIONAL_ENVIRONMENT}
+  chown ${REDMINE_USER}:${REDMINE_USER} ${ADDITIONAL_ENVIRONMENT}
+}
+
+### assembly plublic methods
+initialize_system() {
+  echo '--Section: initialize_system...'
+  initialize_logdir
+  initialize_datadir
+  generate_ssh_client_keys
+  symlink_dotfiles
+}
+
+configure_redmine() {
+  echo '--Section: initialize_redmine...'
+  configure_database
+  configure_environments
+}
+
+### public method
+version_check() {
+  echo "version check..."
+  CACHE_VERSION=
+  CACHE_IMAGE_VERSION=
+  [[ -f "${REDMINE_DATA_DIR}/tmp/VERSION" ]] && CACHE_VERSION=$(cat "${REDMINE_DATA_DIR}/tmp/VERSION")
+  [[ -f "${REDMINE_DATA_DIR}/tmp/IMAGE_VERSION" ]] && CACHE_IMAGE_VERSION=$(cat "${REDMINE_DATA_DIR}/tmp/IMAGE_VERSION")
+
+  ## version check, only redmine upgrades are allowed
+  if [[ -n "${CACHE_VERSION}" && $(vercmp "${REDMINE_VERSION}" "${CACHE_VERSION}") -lt 0 ]]; then
+    echo
+    echo "ERROR: "
+    echo "  Cannot downgrade from Redmine version ${CACHE_VERSION} to ${REDMINE_VERSION}."
+    echo "  Only upgrades are allowed. Please use sameersbn/redmine:${CACHE_VERSION} or higher."
+    echo "  Cannot continue. Aborting!"
+    echo
+    return 1
+  fi
+
+  if [[ "${IMAGE_VERSION}" != "${CACHE_IMAGE_VERSION}" ]]; then
+    # If IMAGE_VERSION has changed, we need to clear the cache
+    echo "New image version. Clearing cache"
+    rm -rf "${REDMINE_DATA_DIR}/tmp"
+    exec_as_redmine mkdir -p "${REDMINE_DATA_DIR}/tmp"
+    exec_as_redmine mkdir -p "${REDMINE_DATA_DIR}/tmp/thumbnails"
+    exec_as_redmine mkdir -p "${REDMINE_DATA_DIR}/tmp/plugin_assets"
+    exec_as_redmine chmod -R u+rw,go+r "${REDMINE_DATA_DIR}/tmp"
+  fi
+
+  # Setup cache
+  # copy the installed gems and Gemfile.lock to ${REDMINE_DATA_DIR}/tmp/
+  if [[ ! -d ${REDMINE_DATA_DIR}/tmp/bundle ]]; then
+    exec_as_redmine cp -a "${REDMINE_INSTALL_DIR}/vendor/bundle" "${REDMINE_DATA_DIR}/tmp/"
+    exec_as_redmine cp -a "${REDMINE_INSTALL_DIR}/Gemfile.lock" "${REDMINE_DATA_DIR}/tmp/"
+  fi
+  rm -rf "${REDMINE_INSTALL_DIR}/vendor/bundle" "${REDMINE_INSTALL_DIR}/Gemfile.lock"
+
+  # Track docker image version in tmp cache
+  echo ${IMAGE_VERSION} | exec_as_redmine tee ${REDMINE_DATA_DIR}/tmp/IMAGE_VERSION >/dev/null
+
+  # symlink to ${REDMINE_DATA_DIR}/tmp/bundle
+  ln -sf "${REDMINE_DATA_DIR}/tmp/bundle" "${REDMINE_INSTALL_DIR}/vendor/bundle"
+  ln -sf "${REDMINE_DATA_DIR}/tmp/Gemfile.lock" "${REDMINE_INSTALL_DIR}/Gemfile.lock"
+}
+
+migrate_database() {
+  echo "migrate_database..."
+  CACHE_VERSION=
+  [[ -f ${REDMINE_DATA_DIR}/tmp/VERSION ]] && CACHE_VERSION=$(cat ${REDMINE_DATA_DIR}/tmp/VERSION)
+  if [[ ${REDMINE_VERSION} != ${CACHE_VERSION} ]]; then
+    echo "Migrating database. Please be patient, this could take a while..."
+    exec_as_redmine bundle exec rake db:create >/dev/null
+    exec_as_redmine bundle exec rake db:migrate >/dev/null
+
+    # clear sessions and application cache
+    exec_as_redmine bundle exec rake tmp:cache:clear >/dev/null
+    exec_as_redmine bundle exec rake tmp:sockets:clear >/dev/null
+
+    # Now that database has been migrated, update version file
+    echo ${REDMINE_VERSION} | exec_as_redmine tee --append ${REDMINE_DATA_DIR}/tmp/VERSION >/dev/null
+  fi
+}
+
+install_plugins() {
+  if [[ -d ${REDMINE_PLUGINS_DIR} ]]; then
+    echo "Installing plugins..."
+    rsync -avq --chown=${REDMINE_USER}:${REDMINE_USER} ${REDMINE_PLUGINS_DIR}/ ${REDMINE_INSTALL_DIR}/plugins/
+
+    # plugins/init script is renamed to plugins/post-install.sh
+    if [[ -f ${REDMINE_PLUGINS_DIR}/init ]]; then
+      mv ${REDMINE_PLUGINS_DIR}/init ${REDMINE_PLUGINS_DIR}/post-install.sh
+    fi
+
+    # execute plugins/pre-install.sh script
+    if [[ -f ${REDMINE_PLUGINS_DIR}/pre-install.sh ]]; then
+      echo "Executing plugins/pre-install.sh script..."
+      . ${REDMINE_PLUGINS_DIR}/pre-install.sh
+    fi
+
+    # install gems and migrate the plugins when plugins are added/removed
+    CURRENT_SHA1=
+    [[ -f ${REDMINE_DATA_DIR}/tmp/plugins.sha1 ]] && CURRENT_SHA1=$(cat ${REDMINE_DATA_DIR}/tmp/plugins.sha1)
+    PLUGINS_SHA1=$(find ${REDMINE_PLUGINS_DIR} -type f -print0 | sort -z | xargs -0 sha1sum | sha1sum | awk '{print $1}')
+    if [[ ${CURRENT_SHA1} != ${PLUGINS_SHA1} ]]; then
+      # remove the existing plugin assets
+      # this ensures there is no cruft when a plugin is removed.
+      rm -rf ${REDMINE_DATA_DIR}/tmp/plugin_assets/*
+
+      echo "Installing gems required by plugins..."
+      exec_as_redmine bundle config set path "${REDMINE_INSTALL_DIR}/vendor/bundle"
+      exec_as_redmine bundle config set without "development test"
+      exec_as_redmine bundle install -j"$(nproc)" --quiet
+
+      echo "Migrating plugins. Please be patient, this could take a while..."
+      exec_as_redmine bundle exec rake redmine:plugins:migrate
+
+      # save SHA1
+      echo -n ${PLUGINS_SHA1} > ${REDMINE_DATA_DIR}/tmp/plugins.sha1
+    fi
+
+    # execute plugins post-install.sh script
+    if [[ -f ${REDMINE_PLUGINS_DIR}/post-install.sh ]]; then
+      echo "Executing plugins/post-install.sh script..."
+      . ${REDMINE_PLUGINS_DIR}/post-install.sh
+    fi
+  else
+    # make sure the plugins.sha1 is not present
+    rm -rf ${REDMINE_DATA_DIR}/tmp/plugins.sha1
+  fi
+}
+
+install_themes() {
+  if [[ -d ${REDMINE_THEMES_DIR} ]]; then
+    echo "Installing themes..."
+    rsync -avq --chown=${REDMINE_USER}:${REDMINE_USER} ${REDMINE_THEMES_DIR}/ ${REDMINE_INSTALL_DIR}/public/themes/
+  fi
+}
+
+# PID1問題のため現在呼び出せていない
+rails_server() {
+  echo "Starting Rails Server..."
+  exec_as_redmine bundle exec rails s -b 0.0.0.0
+}
