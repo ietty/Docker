@@ -29,13 +29,15 @@ exec_as_redmine rm -rf /tmp/redmine-${REDMINE_VERSION}.tar.gz
 
 # dalli -> memcachedのクライアントgem
 (
-  echo '# add for redmine/redmine'
+  echo '# add for redmine/redmine';
   echo 'gem "unicorn", "~> 5.4", "!=5.5.0"';
   echo 'gem "dalli", "~> 2.7.0"';
-  echo '# pry'
-  echo 'gem "pry-rails"';
-  echo 'gem "pry-doc"';
-  echo 'gem "rb-readline"';
+  echo '# pry';
+  echo 'group :development do'
+  echo '  gem "pry-rails"';
+  echo '  gem "pry-doc"';
+  echo '  gem "rb-readline"';
+  echo 'end';
 ) >> ${REDMINE_INSTALL_DIR}/Gemfile
 
 # 先にdatabase.yml作っておかないとbundle installで落ちる
