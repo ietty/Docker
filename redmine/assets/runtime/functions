@@ -185,7 +185,7 @@ configure_environments() {
   chown ${REDMINE_USER}:${REDMINE_USER} ${ADDITIONAL_ENVIRONMENT}
 
   echo 'configure_application_config...'
-  ROW=`grep -n config.time_zone application.rb | cut -d ":" -f 1`
+  ROW=`grep -n config.time_zone ${APPLICATION_CONFIG} | cut -d ":" -f 1`
   TIMEZONE='config.time_zone = 'Asia/Tokyo''
   sed -i -e "${ROW}d" ${APPLICATION_CONFIG}
   sed -i -e "${ROW}a \    ${TIMEZONE}" ${APPLICATION_CONFIG}
