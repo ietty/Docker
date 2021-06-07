@@ -290,13 +290,12 @@ install_plugins() {
     [[ -f ${REDMINE_DATA_DIR}/tmp/plugins.sha1 ]] && CURRENT_SHA1=$(cat ${REDMINE_DATA_DIR}/tmp/plugins.sha1)
     PLUGINS_SHA1=$(find ${REDMINE_PLUGINS_DIR} -type f -print0 | sort -z | xargs -0 sha1sum | sha1sum | awk '{print $1}')
     if [[ ${CURRENT_SHA1} != ${PLUGINS_SHA1} ]]; then
-      # remove the existing plugin assets
-      # this ensures there is no cruft when a plugin is removed.
+      # 既存のプラグインの残骸を削除
       rm -rf ${REDMINE_DATA_DIR}/tmp/plugin_assets/*
 
       echo "Installing gems required by plugins..."
       exec_as_redmine bundle config set path "${REDMINE_INSTALL_DIR}/vendor/bundle"
-      exec_as_redmine bundle config set without "development test"
+      exec_as_redmine bundle config set without "test"
       exec_as_redmine bundle install -j"$(nproc)" --quiet
 
       echo "Migrating plugins. Please be patient, this could take a while..."
