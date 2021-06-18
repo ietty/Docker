@@ -19,11 +19,13 @@ case ${1} in
 
     # TODO:call rails_server()
     bash -c "tail -f /dev/null"
+    rails_server
     ;;
   app:restart)
     version_check
     migrate_database
     install_plugins
     install_themes
+    rails_server
     ;;
 esac

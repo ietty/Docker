@@ -323,7 +323,6 @@ install_themes() {
   fi
 }
 
-# PID1問題のため現在呼び出せていない
 rails_server() {
   echo "Starting Rails Server..."
   exec_as_redmine bundle exec rails s -b 0.0.0.0
