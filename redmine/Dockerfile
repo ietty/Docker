@@ -30,8 +30,6 @@ RUN apt-get update \
 
 COPY assets/build/ ${REDMINE_BUILD_ASSETS_DIR}/
 
-COPY config/ ${REDMINE_CONFIG_DIR}
-
 RUN bash ${REDMINE_BUILD_ASSETS_DIR}/install.sh
 
 COPY assets/runtime/ ${REDMINE_RUNTIME_ASSETS_DIR}/

@@ -36,6 +36,7 @@ initialize_logdir() {
 
 initialize_datadir() {
   echo "Initializing datadir..."
+  mkdir -p ${REDMINE_DATA_DIR}
   chmod -R u+rw,go+r ${REDMINE_DATA_DIR}
   chown -R ${REDMINE_USER}: ${REDMINE_DATA_DIR}
 
@@ -172,15 +173,22 @@ configure_environments() {
 
   REDMINE_SECRETS_CONFIG="${REDMINE_INSTALL_DIR}/config/secrets.yml"
   ADDITIONAL_ENVIRONMENT="${REDMINE_INSTALL_DIR}/config/additional_environment.rb"
+  APPLICATION_CONFIG="${REDMINE_INSTALL_DIR}/config/application.rb"
 
   echo "$RAILS_ENV:" > ${REDMINE_SECRETS_CONFIG}
   echo "  secret_key_base: "${REDMINE_SECRET_KEY_BASE} >> ${REDMINE_SECRETS_CONFIG}
   chown ${REDMINE_USER}:${REDMINE_USER} ${REDMINE_SECRETS_CONFIG}
 
-  echo 'configure_add_environments...'
+  echo 'configure_additional_environments...'
   # logを標準出力するための魔術
   echo 'config.logger = Logger.new(STDOUT)' > ${ADDITIONAL_ENVIRONMENT}
   chown ${REDMINE_USER}:${REDMINE_USER} ${ADDITIONAL_ENVIRONMENT}
+
+  echo 'configure_application_config...'
+  ROW=`grep -n config.time_zone ${APPLICATION_CONFIG} | cut -d ":" -f 1`
+  TIMEZONE="config.time_zone = 'Asia/Tokyo'"
+  sed -i -e "${ROW}a \    ${TIMEZONE}" ${APPLICATION_CONFIG}
+  chown ${REDMINE_USER}:${REDMINE_USER} ${APPLICATION_CONFIG}
 }
 
 ### assembly plublic methods
@@ -282,13 +290,12 @@ install_plugins() {
     [[ -f ${REDMINE_DATA_DIR}/tmp/plugins.sha1 ]] && CURRENT_SHA1=$(cat ${REDMINE_DATA_DIR}/tmp/plugins.sha1)
     PLUGINS_SHA1=$(find ${REDMINE_PLUGINS_DIR} -type f -print0 | sort -z | xargs -0 sha1sum | sha1sum | awk '{print $1}')
     if [[ ${CURRENT_SHA1} != ${PLUGINS_SHA1} ]]; then
-      # remove the existing plugin assets
-      # this ensures there is no cruft when a plugin is removed.
+      # 既存のプラグインの残骸を削除
       rm -rf ${REDMINE_DATA_DIR}/tmp/plugin_assets/*
 
       echo "Installing gems required by plugins..."
       exec_as_redmine bundle config set path "${REDMINE_INSTALL_DIR}/vendor/bundle"
-      exec_as_redmine bundle config set without "development test"
+      exec_as_redmine bundle config set without "test"
       exec_as_redmine bundle install -j"$(nproc)" --quiet
 
       echo "Migrating plugins. Please be patient, this could take a while..."
@@ -316,7 +323,6 @@ install_themes() {
   fi
 }
 
-# PID1問題のため現在呼び出せていない
 rails_server() {
   echo "Starting Rails Server..."
   exec_as_redmine bundle exec rails s -b 0.0.0.0
