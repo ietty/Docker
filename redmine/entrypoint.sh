@@ -17,8 +17,6 @@ case ${1} in
     # pidが書かれているとプロセスがあると判断されるので消す
     rm -f tmp/pids/server.pid
 
-    # TODO:call rails_server()
-    bash -c "tail -f /dev/null"
     rails_server
     ;;
   app:restart)
