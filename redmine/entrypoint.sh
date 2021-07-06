@@ -24,6 +24,10 @@ case ${1} in
     migrate_database
     install_plugins
     install_themes
+
+    pkill -f rails
+    rm -f tmp/pids/server.pid
+
     rails_server
     ;;
 esac
