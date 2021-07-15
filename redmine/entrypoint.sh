@@ -15,19 +15,17 @@ case ${1} in
     install_themes
 
     # pidが書かれているとプロセスがあると判断されるので消す
-    rm -f tmp/pids/server.pid
-
+    start_tail
     rails_server
     ;;
   app:restart)
     version_check
+    bundle_install
     migrate_database
     install_plugins
     install_themes
 
     pkill -f rails
-    rm -f tmp/pids/server.pid
-
     rails_server
     ;;
 esac
