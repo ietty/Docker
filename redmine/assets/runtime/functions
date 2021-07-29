@@ -328,12 +328,12 @@ bundle_install() {
   exec_as_redmine bundle install
 }
 
-start_tail() {
-  tail -f /dev/null
-}
-
 rails_server() {
   echo "Starting Rails Server..."
-  rm -f tmp/pids/server.pid
-  exec_as_redmine bundle exec rails s -b 0.0.0.0
+  if [[ ${RAILS_ENV} == "development" ]]; then
+    tail -f /dev/null
+  else
+    rm -f tmp/pids/server.pid
+    exec_as_redmine bundle exec rails s -b 0.0.0.0
+  fi
 }

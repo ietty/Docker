@@ -15,7 +15,6 @@ case ${1} in
     install_themes
 
     # pidが書かれているとプロセスがあると判断されるので消す
-    start_tail
     rails_server
     ;;
   app:restart)
@@ -25,7 +24,6 @@ case ${1} in
     install_plugins
     install_themes
 
-    pkill -f rails
     rails_server
     ;;
 esac
