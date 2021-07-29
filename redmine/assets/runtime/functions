@@ -323,7 +323,17 @@ install_themes() {
   fi
 }
 
+bundle_install() {
+  cd ${REDMINE_INSTALL_DIR}
+  exec_as_redmine bundle install
+}
+
 rails_server() {
   echo "Starting Rails Server..."
-  exec_as_redmine bundle exec rails s -b 0.0.0.0
+  if [[ ${RAILS_ENV} == "development" ]]; then
+    tail -f /dev/null
+  else
+    rm -f tmp/pids/server.pid
+    exec_as_redmine bundle exec rails s -b 0.0.0.0
+  fi
 }
