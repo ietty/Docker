@@ -1,6 +1,8 @@
 name=`basename ${PWD}`
 tag=`date +%Y%m%d`01
 
+echo "tag: ${tag}"
+
 registry=ietty
 public_ecr=public.ecr.aws/b5w9v1j5
 private_ecr=888777505088.dkr.ecr.us-west-2.amazonaws.com

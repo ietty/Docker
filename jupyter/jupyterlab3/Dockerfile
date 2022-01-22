@@ -15,6 +15,12 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 
 RUN update-locale LANGUAGE=ja_JP:ja LANG=ja_JP.UTF-8
 
+RUN groupadd -g 500 ec2-user && \
+    useradd -u 500 -g 500 -m -s /bin/bash ec2-user && \
+    useradd -u 1001 -g 500 -m -s /bin/bash docker && \
+    usermod -G ec2-user jovyan && \
+    usermod -G ec2-user docker 
+
 USER $NB_USER
 ENV VISIBLE=now
 ENV TERM=xterm
@@ -40,14 +46,26 @@ RUN conda install --quiet --yes \
   && conda build purge-all
 
 RUN conda install --quiet --yes \
+  'gensim' \
+  'tqdm' \
   'sentencepiece' \
   'google-cloud-language' \
   && conda build purge-all
 
 RUN /opt/conda/bin/pip install --upgrade pip
-RUN /opt/conda/bin/pip install redis hiredis pybigquery bash_kernel jupyter_contrib_nbextensions environment_kernels
+RUN /opt/conda/bin/pip install \
+  redis hiredis \
+  pybigquery \
+  bash_kernel \
+  jupyter_contrib_nbextensions \
+  environment_kernels \
+  jupyterlab_execute_time
 
 RUN python -m bash_kernel.install && \
-    jupyter labextension install @jupyterlab/debugger && \
+    jupyter labextension install \
+    @jupyterlab/debugger \
+    && \
     jupyter contrib nbextension install --user 
 
+ENV JUPYTER_ENABLE_LAB=yes
+CMD start-notebook.sh --NotebookApp.token=''
