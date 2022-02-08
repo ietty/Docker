@@ -32,7 +32,7 @@ function pushPrivateECR(){
 }
 
 
-#pushDockerHub
+pushDockerHub
 #pushPublicECR
-pushPrivateECR
+#pushPrivateECR
 
