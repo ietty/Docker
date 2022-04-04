@@ -10,7 +10,8 @@ RUN apt-get upgrade -y && apt-get update -y && \
     g++ zlib1g-dev libssl-dev libreadline-dev libyaml-dev libxml2-dev \
     libaio1 libxslt-dev libxml2-dev qtdeclarative5-dev imagemagick libffi-dev \
     checkinstall libjpeg-dev aptitude software-properties-common redis-tools \
-    fonts-ipaexfont-gothic fonts-ipaexfont-mincho fonts-ubuntu-font-family-console
+    fonts-ipaexfont-gothic fonts-ipaexfont-mincho fonts-ubuntu-font-family-console \
+    libldap2-dev libidn11-dev
 
 #mysqlクライアント
 RUN apt-get install -y mysql-server-8.0 mysql-client-8.0 default-libmysqlclient-dev
@@ -70,7 +71,7 @@ RUN apt-get -y clean
 
 #gem関連
 RUN printf "install: --no-document\ninstall: --no-document\n" > /home/docker/.gemrc && \
-    bash -lc 'gem update --system && gem install bundler && gem install foreman'
+    bash -lc 'gem update --system && gem install bundler -v 2.3.10 && gem install foreman'
 
 #redis
 
