@@ -179,11 +179,6 @@ configure_environments() {
   echo "  secret_key_base: "${REDMINE_SECRET_KEY_BASE} >> ${REDMINE_SECRETS_CONFIG}
   chown ${REDMINE_USER}:${REDMINE_USER} ${REDMINE_SECRETS_CONFIG}
 
-  echo 'configure_additional_environments...'
-  # logを標準出力するための魔術
-  echo 'config.logger = Logger.new(STDOUT)' > ${ADDITIONAL_ENVIRONMENT}
-  chown ${REDMINE_USER}:${REDMINE_USER} ${ADDITIONAL_ENVIRONMENT}
-
   echo 'configure_application_config...'
   ROW=`grep -n config.time_zone ${APPLICATION_CONFIG} | cut -d ":" -f 1`
   TIMEZONE="config.time_zone = 'Asia/Tokyo'"

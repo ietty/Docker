@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 
 LABEL maintainer="shintaro.tanaka@ietty.co.jp"
 
-ENV RUBY_VERSION=2.5 \
+ENV RUBY_VERSION=2.6 \
     REDMINE_VERSION=4.1.1 \
     REDMINE_USER="redmine" \
     REDMINE_HOME="/home/redmine" \
@@ -15,6 +15,9 @@ ENV REDMINE_INSTALL_DIR="${REDMINE_HOME}/redmine" \
     REDMINE_DATA_DIR="${REDMINE_HOME}/data" \
     REDMINE_BUILD_ASSETS_DIR="${REDMINE_ASSETS_DIR}/build" \
     REDMINE_RUNTIME_ASSETS_DIR="${REDMINE_ASSETS_DIR}/runtime"
+
+# rubyのバージョンを2.5以外にするための対応
+RUN apt-get update && apt-get install software-properties-common -y libmariadb-dev -y libmysqlclient-dev -y && apt-add-repository ppa:brightbox/ruby-ng -y
 
 RUN apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
