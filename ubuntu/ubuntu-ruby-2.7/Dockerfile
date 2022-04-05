@@ -2,8 +2,8 @@ FROM ubuntu:xenial
 
 LABEL MAINTAINER takemi.ohama@ietty.co.jp
 
-ENV TERM xterm
-ENV DEBIAN_FRONTEND noninteractive
+ENV TERM=xterm
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get upgrade -y && apt-get update -y && \
     apt-get install -y git curl wget mysql-client libmysqlclient-dev \
     g++ zlib1g-dev libssl-dev libreadline-dev libreadline6-dev libyaml-dev \
