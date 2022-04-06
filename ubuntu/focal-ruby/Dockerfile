@@ -11,7 +11,7 @@ RUN apt-get upgrade -y && apt-get update -y && \
     libaio1 libxslt-dev libxml2-dev qtdeclarative5-dev imagemagick libffi-dev \
     checkinstall libjpeg-dev aptitude software-properties-common redis-tools \
     fonts-ipaexfont-gothic fonts-ipaexfont-mincho fonts-ubuntu-font-family-console \
-    libldap2-dev libidn11-dev
+    libldap2-dev libidn11-dev sudo  
 
 #mysqlクライアント
 RUN apt-get install -y mysql-server-8.0 mysql-client-8.0 default-libmysqlclient-dev
