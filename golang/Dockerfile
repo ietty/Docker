@@ -1,15 +1,24 @@
-FROM golang:1.15
+FROM golang:1.18.1
 
 LABEL maintainer="takemi.ohama@gmail.com"
 
-RUN go get github.com/jinzhu/gorm github.com/jinzhu/gorm/dialects/mysql \
-           github.com/joho/godotenv googlemaps.github.io/maps github.com/pkg/errors \
-           github.com/aws/aws-sdk-go github.com/guregu/dynamo
+RUN go install \
+    gorm.io/gorm@latest \
+    gorm.io/drivers/mysql@latest \
+    github.com/joho/godotenv@latest \
+    googlemaps.github.io/maps@latest \
+    github.com/pkg/errors@latest \
+    github.com/aws/aws-sdk-go@latest \
+    github.com/guregu/dynamo@latest 
 
 #for VSCode
-RUN go get github.com/uudashr/gopkgs/v2/cmd/gopkgs github.com/sqs/goreturns \
-           golang.org/x/tools/cmd/gorename github.com/ramya-rao-a/go-outline \
-           github.com/go-delve/delve/cmd/dlv github.com/mdempsky/gocode \
-           github.com/rogpeppe/godef
+RUN go install \
+    github.com/uudashr/gopkgs/v2/cmd/gopkgs@latest \
+    github.com/sqs/goreturns@latest \
+    golang.org/x/tools/cmd/gorename@latest \
+    github.com/ramya-rao-a/go-outline@latest \
+    github.com/go-delve/delve/cmd/dlv@latest \
+    github.com/mdempsky/gocode@latest \
+    github.com/rogpeppe/godef@latest
 
 

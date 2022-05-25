@@ -1,0 +1,33 @@
+version: '3.7'
+
+services:
+
+  webs:
+    image: ietty/jupyterhub:2022031901
+    init: true
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - 8096:8000
+    command: jupyterhub -f /etc/jupyter/jupyterhub_config.py
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    configs:
+      - source: jupyterhub_config
+        target: /etc/jupyter/jupyterhub_config.py
+    networks:
+      - jupyterhub_network
+    environment:
+      - OAUTH_CLIENT_ID=
+      - OAUTH_CLIENT_SECRET=
+      - OAUTH_CALLBACK_URL=https://jupyter.ietty.me/hub/oauth_callback
+      - DOCKER_NETWORK_NAME=jupyterhub_network
+
+configs:
+  jupyterhub_config:
+    external: true
+
+networks:
+  jupyterhub_network:
+    external: true
