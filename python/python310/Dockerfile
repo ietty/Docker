@@ -4,7 +4,7 @@ LABEL MAINTAINER takemi.ohama<takemi.ohama@gmail.com>
 
 USER root
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends \
     git vim wget mysql-client ssh libreadline-dev curl \
