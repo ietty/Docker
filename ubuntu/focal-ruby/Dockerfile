@@ -15,8 +15,8 @@ RUN apt-get update -y && \
 
 #作業用ユーザ作成
 RUN useradd -m -s /bin/bash docker && \
-    usermod -G users docker && \
-    usermod -G users root && \
+    usermod -aG users docker && \
+    usermod -aG users root && \
     echo '%users ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
     # docker 
@@ -48,7 +48,7 @@ RUN git clone https://github.com/sstephenson/ruby-build.git && \
     git clone https://github.com/rkh/rbenv-update.git && \
     git clone https://github.com/sstephenson/rbenv-default-gems.git
 RUN chgrp -R rbenv /usr/local/rbenv/plugins && chmod -R g+rwxs /usr/local/rbenv/plugins
-RUN usermod -G rbenv docker
+RUN usermod -aG rbenv docker
 
 #rbenvの環境設定
 RUN echo 'export RBENV_ROOT="/usr/local/rbenv"' > /etc/profile.d/rbenv.sh && \
