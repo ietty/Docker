@@ -15,7 +15,7 @@ case ${1} in
     install_themes
 
     # pidが書かれているとプロセスがあると判断されるので消す
-    rails_server
+    black_hole
     ;;
   app:restart)
     version_check
@@ -24,6 +24,6 @@ case ${1} in
     install_plugins
     install_themes
 
-    rails_server
+    black_hole
     ;;
 esac

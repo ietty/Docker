@@ -332,3 +332,8 @@ rails_server() {
     exec_as_redmine bundle exec rails s -b 0.0.0.0
   fi
 }
+
+black_hole() {
+  echo "black hole"
+  tail -f /dev/null
+}
