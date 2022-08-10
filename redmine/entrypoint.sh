@@ -10,9 +10,9 @@ case ${1} in
     configure_redmine
     version_check
     migrate_database
+    create_symbolic_link
     install_plugins
     install_themes
-    create_symbolic_link
     rails_server
     ;;
   app:restart)

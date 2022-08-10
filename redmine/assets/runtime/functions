@@ -335,18 +335,23 @@ rails_server() {
 
 create_symbolic_link() {
   # cors
-  ln -s /mnt/iCRM/cors.rb /home/redmine/redmine/config/initializers/cors.rb & \
-  chown -h redmine:redmine /home/redmine/redmine/config/initializers/cors.rb & \
+  ln -s /mnt/iCRM/cors.rb /home/redmine/redmine/config/initializers/cors.rb
   # omniauth
-  ln -s /mnt/iCRM/omniauth.rb /home/redmine/redmine/config/initializers/omniauth.rb & \
-  chown -h redmine:redmine /home/redmine/redmine/config/initializers/omniauth.rb & \
+  ln -s /mnt/iCRM/omniauth.rb /home/redmine/redmine/config/initializers/omniauth.rb
   # enviroment config
-  ln -s /mnt/iCRM/staging.rb /home/redmine/redmine/config/environments/staging.rb & \
-  chown -h redmine:redmine /home/redmine/redmine/config/environments/staging.rb & \
+  ln -s /mnt/iCRM/staging.rb /home/redmine/redmine/config/environments/staging.rb
   # configuration
-  ln -s /mnt/iCRM/configuration.yml /home/redmine/redmine/config/configuration.yml & \
-  chown -h redmine:redmine /home/redmine/redmine/config/configuration.yml
+  ln -s /mnt/iCRM/configuration.yml /home/redmine/redmine/config/configuration.yml
   # database
-  ln -sf /mnt/iCRM/database.yml /home/redmine/redmine/config/database.yml & \
+  ln -sf /mnt/iCRM/database.yml /home/redmine/redmine/config/database.yml
+  # plugins
+  rm /home/redmine/redmine/plugins/README
+  ln -s /mnt/iCRM/ietty_crm_plugins/* /home/redmine/redmine/plugins/
+  # owner change
+  chown -h redmine:redmine /home/redmine/redmine/config/initializers/cors.rb
+  chown -h redmine:redmine /home/redmine/redmine/config/initializers/omniauth.rb
+  chown -h redmine:redmine /home/redmine/redmine/config/environments/staging.rb
+  chown -h redmine:redmine /home/redmine/redmine/config/configuration.yml
   chown -h redmine:redmine /home/redmine/redmine/config/database.yml
+  chown -hR redmine:redmine /home/redmine/redmine/plugins/*
 }
