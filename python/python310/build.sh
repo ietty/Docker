@@ -6,7 +6,7 @@ registry=ietty
 public_ecr=public.ecr.aws/b5w9v1j5
 private_ecr=888777505088.dkr.ecr.ap-northeast-1.amazonaws.com
 
-docker build -t ${registry}/${name}:${tag} .
+docker build --no-cache -t ${registry}/${name}:${tag} .
 
 function pushDockerHub(){
     docker tag ${registry}/${name}:${tag} ${registry}/${name}:latest

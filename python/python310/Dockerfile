@@ -14,7 +14,7 @@ RUN apt-get update -y && \
 RUN locale-gen en_US.UTF-8 && \
     update-locale LANG=en_US.UTF-8
 
-ARG PYTHON_VERSION=3.10.0
+ARG PYTHON_VERSION=3.10.5
 ARG O_USER="docker"
 ARG O_UID="1000"
 ARG O_GID="1000"
