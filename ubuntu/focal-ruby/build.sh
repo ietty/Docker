@@ -18,6 +18,7 @@ function pushPrivateECR(){
     aws ecr create-repository --repository-name ${name}
     docker tag ${registry}/${name}:${tag} ${private_ecr}/${name}:${tag}
     docker push ${private_ecr}/${name}:${tag}
+    docker push ${private_ecr}/${name}:latest
     echo "pushed: ${private_ecr}/${name}:${tag}"
 }
 
