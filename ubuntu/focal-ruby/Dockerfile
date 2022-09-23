@@ -1,6 +1,6 @@
 FROM ubuntu:focal
 
-LABEL "shintaro.tanaka" <shintaro.tanaka@ietty.co.jp>
+LABEL MAINTENER shintaro.tanaka<shintaro.tanaka@ietty.co.jp>
 
 ENV TERM=xterm
 ENV TZ=Asia/Tokyo
