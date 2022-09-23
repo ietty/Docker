@@ -28,6 +28,6 @@ USER docker
 WORKDIR /home/docker
 
 RUN mamba install -y python-dotenv autopep8 pytest 
-RUN pip install aws-cdk-lib constructs cdk-remote-stack
+RUN pip install aws-cdk-lib constructs cdk-remote-stack pyyaml
 
 RUN git config --global credential.helper store
