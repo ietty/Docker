@@ -10,7 +10,7 @@ RUN apt-get upgrade -y && apt-get update -y && \
     libxml2-dev libaio1 libxslt-dev libqt4-dev imagemagick libffi-dev \
     checkinstall libjpeg-dev aptitude software-properties-common redis-tools \
     autoconf bison build-essential  zlib1g-dev libncurses5-dev \
-    libgdbm-dev libdb-dev tzdata sudo
+    libgdbm-dev libdb-dev tzdata sudo unzip
 
 #rbenvとpluginのダウンロード
 WORKDIR /usr/local
