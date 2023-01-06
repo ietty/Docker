@@ -8,13 +8,11 @@ case ${1} in
   app:init)
     initialize_system
     configure_redmine
-
     version_check
     migrate_database
+    create_symbolic_link
     install_plugins
     install_themes
-
-    # pidが書かれているとプロセスがあると判断されるので消す
     rails_server
     ;;
   app:restart)
@@ -23,7 +21,6 @@ case ${1} in
     migrate_database
     install_plugins
     install_themes
-
     rails_server
     ;;
 esac

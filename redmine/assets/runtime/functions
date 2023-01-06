@@ -332,3 +332,32 @@ rails_server() {
     exec_as_redmine bundle exec rails s -b 0.0.0.0
   fi
 }
+
+create_symbolic_link() {
+  echo "Create Symbolic Link..."
+  if [[ ${RAILS_ENV} != "development" ]]; then
+    # cors
+    ln -s /mnt/iCRM/cors.rb /home/redmine/redmine/config/initializers/cors.rb
+    # omniauth
+    ln -s /mnt/iCRM/omniauth.rb /home/redmine/redmine/config/initializers/omniauth.rb
+    # enviroment config
+    if -e cat /home/redmine/redmine/config/environments/${RAILS_ENV}.rb; then
+      rm -rf /home/redmine/redmine/config/environments/${RAILS_ENV}.rb
+    fi
+    ln -nfs /mnt/iCRM/${RAILS_ENV}.rb /home/redmine/redmine/config/environments/${RAILS_ENV}.rb
+    # configuration
+    ln -s /mnt/iCRM/configuration.yml /home/redmine/redmine/config/configuration.yml
+    # database
+    ln -sf /mnt/iCRM/database.yml /home/redmine/redmine/config/database.yml
+    # plugins
+    rm /home/redmine/redmine/plugins/README
+    ln -s /mnt/iCRM/ietty_crm_plugins/* /home/redmine/redmine/plugins/
+    # owner change
+    chown -h redmine:redmine /home/redmine/redmine/config/initializers/cors.rb
+    chown -h redmine:redmine /home/redmine/redmine/config/initializers/omniauth.rb
+    chown -h redmine:redmine /home/redmine/redmine/config/environments/${RAILS_ENV}.rb
+    chown -h redmine:redmine /home/redmine/redmine/config/configuration.yml
+    chown -h redmine:redmine /home/redmine/redmine/config/database.yml
+    chown -hR redmine:redmine /home/redmine/redmine/plugins/*
+  fi
+}
