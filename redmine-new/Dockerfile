@@ -1,6 +1,10 @@
 FROM ubuntu:focal
 
-LABEL maintainer shintaro.tanaka<shintaro.tanaka@ietty.co.jp>
+LABEL MAINTENER shintaro.tanaka<shintaro.tanaka@ietty.co.jp>
+
+ENV TERM=xterm \
+    TZ=Asia/Tokyo
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 ENV RUBY_VERSION=2.6 \
     REDMINE_VERSION=4.2.9 \
@@ -13,18 +17,12 @@ ENV RUBY_VERSION=2.6 \
 # OS Configuration
 RUN locale-gen ja_JP.UTF-8
 
-# Dependent Packages
-RUN apt-get update \
-  && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-    logrotate mysql-client ca-certificates sudo tzdata locales \
-    imagemagick git cvs rsync ruby${RUBY_VERSION} openssh-client \
-    make patch pkg-config ruby${RUBY_VERSION}-dev libc6-dev zlib1g-dev libxml2-dev \
-    libmysqlclient20 libyaml-0-2 libcurl3 libssl1.0.0 uuid-dev xz-utils \
-    libxslt1.1 libffi6 zlib1g gsfonts ghostscript \
-    wget vim lsof \
-  && update-locale LANG=C.UTF-8 LC_MESSAGES=POSIX \
-  && gem install --no-document bundler \
-  && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && \
+    apt-get install -y git curl wget sudo vim ca-certificates gnupg \
+    zlib1g-dev libssl-dev libreadline-dev libyaml-dev libxml2-dev \
+    mysql-client-8.0 default-libmysqlclient-dev imagemagick cvs \
+    ruby${RUBY_VERSION} ruby${RUBY_VERSION}-dev gsfonts ghostscript \
+    && rm -rf /var/lib/apt/lists/*
 
 #作業用ユーザ作成
 RUN useradd -m -s /bin/bash docker && \
@@ -32,17 +30,13 @@ RUN useradd -m -s /bin/bash docker && \
     usermod -aG users root && \
     echo '%users ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-COPY assets/ ${REDMINE_ASSETS_DIR}/
-RUN bash ${REDMINE_ASSETS_DIR}/install.sh
-
-COPY entrypoint.sh /sbin/entrypoint.sh
-RUN chmod 755 /sbin/entrypoint.sh
-
-EXPOSE 3000/tcp
+# redmineインストール
+RUN mkdir -p ${REDMINE_HOME} \
+    wget "http://www.redmine.org/releases/redmine-${REDMINE_VERSION}.tar.gz" -O /tmp/redmine-${REDMINE_VERSION}.tar.gz \
+    tar -zxf /tmp/redmine-${REDMINE_VERSION}.tar.gz --strip=1 -C ${REDMINE_HOME} \
+    rm -rf /tmp/redmine-${REDMINE_VERSION}.tar.gz
 
 USER docker
 WORKDIR ${REDMINE_HOME}
 
-ENTRYPOINT ["/sbin/entrypoint.sh"]
-
-CMD ["app:init"]
+CMD ["tail","-f","/dev/null"]
