@@ -6,16 +6,21 @@ ENV TERM=xterm \
     TZ=Asia/Tokyo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-ENV RUBY_VERSION=2.7 \
+ENV RUBY_VERSION=2.7.2 \
     REDMINE_VERSION=4.2.9 \
     REDMINE_HOME="/home/redmine"
 
+# package install
 RUN apt-get update -y && \
     apt-get install -y git curl wget sudo vim ca-certificates gnupg \
     zlib1g-dev libssl-dev libreadline-dev libyaml-dev libxml2-dev \
     mysql-client-8.0 default-libmysqlclient-dev imagemagick cvs \
-    ruby${RUBY_VERSION} ruby${RUBY_VERSION}-dev gsfonts ghostscript \
+    gsfonts ghostscript make gcc \
     && rm -rf /var/lib/apt/lists/*
+
+# ruby install
+RUN git clone --depth=1 https://github.com/rbenv/ruby-build && PREFIX=/usr/local ./ruby-build/install.sh && rm -rf ruby-build
+RUN ruby-build ${RUBY_VERSION} /usr/local
 
 #作業用ユーザ作成
 RUN useradd -m -s /bin/bash redmine && \
