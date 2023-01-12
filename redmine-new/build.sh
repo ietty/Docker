@@ -2,7 +2,8 @@
 registry=ietty
 name=ubuntu-redmine
 private_ecr=888777505088.dkr.ecr.ap-northeast-1.amazonaws.com
-tag=`date +"%Y%m%d"`
+tag=latest
+# tag=`date +"%Y%m%d"`
 
 docker build --no-cache -t ${registry}/${name}:${tag} .
 docker tag ${registry}/${name}:${tag} ${registry}/${name}:${tag}
