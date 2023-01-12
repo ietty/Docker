@@ -1,6 +1,6 @@
 #!/bin/bash
 registry=ietty
-name=redmine-new
+name=ubuntu-redmine
 private_ecr=888777505088.dkr.ecr.ap-northeast-1.amazonaws.com
 tag=`date +"%Y%m%d"`
 
@@ -14,4 +14,4 @@ function pushPrivateECR(){
     echo "pushed: ${private_ecr}/${name}:${tag}"
 }
 
-#pushPrivateECR
+pushPrivateECR
