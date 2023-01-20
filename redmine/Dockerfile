@@ -1,52 +1,39 @@
-FROM ubuntu:18.04
+FROM ubuntu:focal
 
-LABEL maintainer="shintaro.tanaka@ietty.co.jp"
+LABEL MAINTENER shintaro.tanaka<shintaro.tanaka@ietty.co.jp>
 
-ENV RUBY_VERSION=2.6 \
-    REDMINE_VERSION=4.1.1 \
-    REDMINE_USER="redmine" \
-    REDMINE_HOME="/home/redmine" \
-    REDMINE_LOG_DIR="/var/log/redmine" \
-    REDMINE_ASSETS_DIR="/etc/assets" \
-    REDMINE_CONFIG_DIR="/etc/config" \
-    RAILS_ENV=production
+ENV TERM=xterm \
+    TZ=Asia/Tokyo
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-ENV REDMINE_INSTALL_DIR="${REDMINE_HOME}/redmine" \
-    REDMINE_DATA_DIR="${REDMINE_HOME}/data" \
-    REDMINE_BUILD_ASSETS_DIR="${REDMINE_ASSETS_DIR}/build" \
-    REDMINE_RUNTIME_ASSETS_DIR="${REDMINE_ASSETS_DIR}/runtime"
+ENV RUBY_VERSION=2.7.2 \
+    REDMINE_VERSION=4.2.9 \
+    REDMINE_HOME="/home/redmine"
 
-# rubyのバージョンを2.5以外にするための対応
-RUN apt-get update && apt-get install software-properties-common -y libmariadb-dev -y libmysqlclient-dev -y && apt-add-repository ppa:brightbox/ruby-ng -y
+# package install
+RUN apt-get update -y && \
+    apt-get install -y git curl wget sudo vim ca-certificates gnupg \
+    zlib1g-dev libssl-dev libreadline-dev libyaml-dev libxml2-dev \
+    mysql-client-8.0 default-libmysqlclient-dev imagemagick cvs \
+    gsfonts ghostscript make gcc \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update \
-  && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-    logrotate mysql-client postgresql-client ca-certificates sudo tzdata \
-    imagemagick subversion git cvs bzr mercurial darcs rsync ruby${RUBY_VERSION} locales openssh-client \
-    gcc g++ make patch pkg-config gettext-base ruby${RUBY_VERSION}-dev libc6-dev zlib1g-dev libxml2-dev \
-    libmysqlclient20 libpq5 libyaml-0-2 libcurl3 libssl1.0.0 uuid-dev xz-utils \
-    libxslt1.1 libffi6 zlib1g gsfonts ghostscript sqlite3 libsqlite3-dev \
-    wget vim lsof ca-certificates openssh-client \
-  && update-locale LANG=C.UTF-8 LC_MESSAGES=POSIX \
-  && gem install --no-document bundler \
-  && rm -rf /var/lib/apt/lists/*
+# ruby install
+RUN git clone --depth=1 https://github.com/rbenv/ruby-build && PREFIX=/usr/local ./ruby-build/install.sh && rm -rf ruby-build
+RUN ruby-build ${RUBY_VERSION} /usr/local
 
-COPY assets/build/ ${REDMINE_BUILD_ASSETS_DIR}/
+#作業用ユーザ作成
+RUN useradd -m -s /bin/bash redmine && \
+    usermod -aG users redmine && \
+    usermod -aG users root && \
+    echo '%users ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-RUN bash ${REDMINE_BUILD_ASSETS_DIR}/install.sh
+# redmineインストール
+RUN wget "http://www.redmine.org/releases/redmine-${REDMINE_VERSION}.tar.gz" -O /tmp/redmine-${REDMINE_VERSION}.tar.gz
+RUN ["/bin/bash", "-c", "tar -zxvf /tmp/redmine-${REDMINE_VERSION}.tar.gz --strip=1 -C ${REDMINE_HOME}"]
+RUN rm -rf /tmp/redmine-${REDMINE_VERSION}.tar.gz
 
-COPY assets/runtime/ ${REDMINE_RUNTIME_ASSETS_DIR}/
+USER redmine
+WORKDIR ${REDMINE_HOME}
 
-COPY entrypoint.sh /sbin/entrypoint.sh
-
-COPY VERSION /VERSION
-
-RUN chmod 755 /sbin/entrypoint.sh
-
-EXPOSE 3000/tcp
-
-WORKDIR ${REDMINE_INSTALL_DIR}
-
-ENTRYPOINT ["/sbin/entrypoint.sh"]
-
-CMD ["app:init"]
+CMD ["tail","-f","/dev/null"]
