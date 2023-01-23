@@ -3,7 +3,7 @@ FROM ubuntu:focal
 LABEL MAINTENER shintaro.tanaka<shintaro.tanaka@ietty.co.jp>
 
 ENV TERM=xterm \
-    TZ=Asia/Tokyo
+    TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 ENV RUBY_VERSION=2.7.2 \
