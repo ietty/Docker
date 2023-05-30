@@ -1,0 +1,6 @@
+japanize-matplotlib
+fugashi
+ipadic
+torch==1.13.1
+transformers==4.27.4
+#sagemaker-datawrangler

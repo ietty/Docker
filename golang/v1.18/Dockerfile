@@ -9,7 +9,7 @@ RUN go install \
     googlemaps.github.io/maps@latest \
     github.com/pkg/errors@latest \
     github.com/aws/aws-sdk-go@latest \
-    github.com/guregu/dynamo@latest 
+    github.com/guregu/dynamo@latest
 
 #for VSCode
 RUN go install \
