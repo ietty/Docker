@@ -14,7 +14,7 @@ function pushDockerHub(){
     echo "pushed: ${registry}/${name}:${tag}"
 }
 function pushPrivateECR(){
-    aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${private_ecr}
+    aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 763104351884.dkr.ecr.us-west-2.amazonaws.com
     aws ecr create-repository --repository-name ${name}
     docker tag ${registry}/${name}:${tag} ${private_ecr}/${name}:${tag}
     docker push ${private_ecr}/${name}:${tag}

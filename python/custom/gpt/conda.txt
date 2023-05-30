@@ -1,0 +1,25 @@
+#base
+boto3
+cython
+pymysql
+numba
+pandas
+python-dotenv
+pytz
+regex
+requests
+smart_open[all]
+sqlalchemy
+openai
+
+#for api
+pydantic
+fastapi
+uvicorn[standard]
+gunicorn
+
+#for dev
+autopep8
+ipykernel
+ipython
+pylint

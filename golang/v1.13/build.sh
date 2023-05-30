@@ -37,5 +37,5 @@ function pushPrivateECR(){
 
 pushDockerHub
 #pushPublicECR
-pushPrivateECR
+#pushPrivateECR
 
